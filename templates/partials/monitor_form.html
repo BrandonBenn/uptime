@@ -1,0 +1,30 @@
+<div class="modal" x-bind:class="open ? 'is-active' : ''">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Edit Monitor</p>
+      <button class="delete" @click="open = false" aria-label="close"></button>
+    </header>
+
+    <section class="modal-card-body">
+      <form class="box">
+        <div class="field">
+          <label class="label">URL</label>
+          <div class="control">
+            <input class="input" x-model="monitor.url">
+          </div>
+        </div>
+        <div class="field">
+          <label class="label">Interval</label>
+          <div class="control">
+            <input type="range" min="1" max="100" value="50" class="slider" id="myRange">
+          </div>
+        </div>
+      </form>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-success">Save Changes</button>
+      <button class="button" @click="open = false">Cancel</button>
+    </footer>
+  </div>
+</div>

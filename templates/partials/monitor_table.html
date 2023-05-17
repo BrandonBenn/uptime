@@ -1,0 +1,12 @@
+<div id="monitor-table" class="is-fullwidth">
+  <div id="table-header" class="columns is-hidden-mobile" style=" border-bottom: 1px solid rgb(73, 80, 87)">
+    <h2 class="column has-text-weight-bold">Name</h2>
+    <h2 class="column has-text-weight-bold">Protocol</h2>
+    <h2 class="column has-text-weight-bold">Interval</h2>
+    <h2 class="column has-text-weight-bold">Status</h2>
+    <h2 class="column has-text-weight-bold"></h2>
+  </div>
+  <div id="monitor-items">
+    {{ range . }} {{ template "partials/monitor_item" . }} {{ end }}
+  </div>
+</div>

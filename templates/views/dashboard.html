@@ -1,0 +1,59 @@
+<style>
+  .menu {
+    position: sticky;
+    display: inline-block;
+    vertical-align: top;
+    max-height: 100vh;
+    overflow-y: auto;
+    width: 200px;
+    top: 0;
+    bottom: 0;
+    padding: 30px;
+  }
+
+  .content {
+    display: inline-block;
+  }
+</style>
+
+<section class="hero is-fullheight" x-data="{ aside: true }">
+  <div class="main-content columns mt-5 mr-5">
+    <div class="menu column is-one-fifth" x-show.important="aside" x-transition>
+      <aside class="column is-narrow-mobile is-fullheight section is-hidden-mobile">
+        <p class="menu-label is-hidden-touch has-text-weight-bold is-size-5">{{ .Email }}</p>
+        <ul class="menu-list">
+          <li><a><i class="fa fa-tachometer" aria-hidden="true"></i> Dashboard</a></li>
+          <li><a><i class="fa fa-cog" aria-hidden="true"></i> Settings</a></li>
+          <li><a href="/logout"><i class="fa fa-user-o" aria-hidden="true"></i> Logout</a></li>
+        </ul>
+      </aside>
+    </div>
+
+    <div class="column">
+      <nav class="breadcrumb" aria-label="breadcrumbs">
+        <div class="level">
+          <ul class="level-left">
+            <li><a href="#">Workspace</a></li>
+            {{ with .Overview }}
+            <li class="is-active"><a href="#" aria-current="page">Overview</a></li>
+            {{ else }}
+            <li class="is-active"><a href="#" aria-current="page">Monitors</a></li>
+            {{ end }}
+          </ul>
+
+          <div class="level-right" x-data="{ modalOpen: true }">
+            <div id="modal"></div>
+            <input type="button" class="button is-black level-item" value="+ New Monitor" hx-get="/monitors/new"
+              hx-target="#monitor-items" hx-swap="beforeend">
+          </div>
+        </div>
+      </nav>
+
+      <div class="columns is-multiline">
+        <div class="column is-full">
+          {{ template "partials/monitor_table" .MonitorData }}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

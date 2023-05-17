@@ -1,0 +1,8 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+cmd = "go build -o ./tmp/http cmd/http/main.go"
+bin = "./tmp/http"
+full_bin = "./tmp/http"
+include_ext = ["go", "html" ]

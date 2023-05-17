@@ -1,0 +1,35 @@
+<section class="hero is-black is-fullheight">
+  <div class="hero-body">
+    <div class="container">
+      <div class="columns is-centered">
+        <div class="column is-6-tablet is-5-desktop is-4-widescreen">
+          <form action="/login" method="post" hx-boost="true">
+            <div class="field">
+              <label class="label has-text-white is-size-5">Email</label>
+              <p class="control has-icons-left has-icons-right">
+                <input
+                  class="input is-large has-text-white has-background-dark {{ if .Error }} is-danger {{ end}} {{ if .Message }} is-success {{ end}}"
+                  type="email" placeholder="" name="email">
+                <span class="icon is-small is-left">
+                  <i class="fa fa-envelope" aria-hidden="true"></i>
+                </span>
+                <span class="icon is-small is-right">
+                  {{ if .Error }}
+                  <i class="fa fa-exclamation-triangle"></i>
+                  {{ else }}
+                  <i class="fa fa-check"></i>
+                  {{ end }}
+                </span>
+              </p>
+            </div>
+            {{ with .Error }}<p class="notification is-danger">{{ . }}</p>{{ end }}
+            {{ with .Message }}<p class="notification is-success">{{ . }}</p>{{ end }}
+            <div class="field">
+              <input type="submit" class="button is-white is-large is-fullwidth" value="Login">
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

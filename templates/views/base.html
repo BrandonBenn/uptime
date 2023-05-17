@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Uptime | {{ if .Title }} {{ .Title }} {{ else }} Home {{ end }}</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/static/favicon.ico">
+  <script src="/static/htmx.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <script defer src="/static/alpinejs.min.js"></script>
+  <link rel="stylesheet" href="/static/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+
+<body>
+  <script>
+    document.body.addEventListener('htmx:configRequest', function (evt) {
+      evt.detail.headers["X-CSRF-Token"] = document.cookie.split('csrf_=').at(1) || ""
+    })
+  </script>
+
+  {{ with .Error }}<p class="notification is-danger">{{ . }}</p>{{ end }}
+  {{ with .Success }}<p class="notification is-success">{{ . }}</p>{{ end }}
+  {{ embed }}
+</body>
+
+</html>

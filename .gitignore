@@ -1,0 +1,6 @@
+.env
+Taskfile.yml
+cookie.jar
+database.sqlite3
+fiber.sqlite3
+tmp/
