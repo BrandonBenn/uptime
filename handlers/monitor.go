@@ -64,7 +64,6 @@ func (h *Monitor) Create(c *fiber.Ctx) error {
 	}
 
 	monitor.UserID = currentUser.ID
-	service.AddMonitor(ctx, h.DB, h.Scheduler, monitor)
 
 	if _, err = h.DB.NewInsert().
 		Model(&monitor).
@@ -73,6 +72,7 @@ func (h *Monitor) Create(c *fiber.Ctx) error {
 		Exec(ctx); err != nil {
 		return err
 	}
+	service.AddMonitor(ctx, h.DB, h.Scheduler, monitor)
 
 	monData := models.MonitorData{
 		StatusCode: 404,
@@ -131,19 +131,16 @@ func (h *Monitor) Delete(c *fiber.Ctx) error {
 		return c.SendStatus(http.StatusAccepted)
 	}
 
+	monitor.ID = int64(monitorID)
+	monitor.UserID = currentUser.ID
+
 	service.RemoveMonitor(ctx, h.Scheduler, monitor)
+
 	var result sql.Result
 	if result, err = h.DB.NewDelete().
 		Model(&monitor).
 		Where("id = ?", monitorID).
-		Where("user_id = ?", currentUser.ID).
-		Exec(ctx); err != nil {
-		return err
-	}
-
-	if result, err = h.DB.NewDelete().
-		Model((*models.MonitorData)(nil)).
-		Where("monitor_id = ?", monitorID).
+		Where("user_id = ?").
 		Exec(ctx); err != nil {
 		return err
 	}
@@ -155,13 +152,7 @@ func (h *Monitor) Delete(c *fiber.Ctx) error {
 		return fiber.NewError(http.StatusNotFound, "Monitor not found")
 	}
 
-	if _, err := h.DB.NewSelect().
-		Model(&monitor).
-		Where("id = ?", monitorID).
-		Where("user_id = ?", currentUser.ID).
-		Exec(ctx); err != nil {
-		return err
-	}
+	h.DB.NewRaw("delete from monitor_data where monitor_id = ?", monitorID).Scan(ctx)
 
 	return c.SendStatus(http.StatusAccepted)
 }

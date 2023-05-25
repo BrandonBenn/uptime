@@ -10,17 +10,17 @@ import (
 	"github.com/uptrace/bun/extra/bundebug"
 )
 
-func NewSqliteDB() *bun.DB {
-	sqldb, err := sql.Open(sqliteshim.ShimName, os.Getenv("DATABASE_FILE"))
+func NewSqliteDB() (*bun.DB, error) {
+	conn, err := sql.Open(sqliteshim.ShimName, os.Getenv("DATABASE_CONN"))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
-	db := bun.NewDB(sqldb, sqlitedialect.New())
+	db := bun.NewDB(conn, sqlitedialect.New())
 	db.AddQueryHook(bundebug.NewQueryHook(
 		bundebug.WithVerbose(true),
 		bundebug.FromEnv("BUNDEBUG"),
 	))
 
-	return db
+	return db, nil
 }
