@@ -22,14 +22,13 @@ import (
 )
 
 func main() {
-	var (
-		app       *fiber.App
-		db        = database.NewSqliteDB()
-		scheduler = gocron.NewScheduler(time.UTC)
-	)
+	db, err := database.NewSqliteDB()
+	if err != nil {
+		panic(err)
+	}
 	defer db.Close()
 
-	app = fiber.New(fiber.Config{
+	app := fiber.New(fiber.Config{
 		Views: html.New("templates", ".html").
 			AddFunc("ToUpper", strings.ToUpper),
 		ViewsLayout: "views/base",
@@ -44,14 +43,17 @@ func main() {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	scheduler := gocron.NewScheduler(time.UTC)
 	if err := setupJobs(ctx, db, scheduler); err != nil {
 		panic(err)
 	}
 
 	setupRoutes(app, db, scheduler)
-
 	scheduler.StartAsync()
-	log.Fatal(app.Listen(address()))
+
+	port := getEnv("PORT", "3000")
+	host := getEnv("HOST", "127.0.0.1")
+	log.Fatal(app.Listen(host + ":" + port))
 }
 
 func setupJobs(ctx context.Context, db *bun.DB, scheduler *gocron.Scheduler) error {
@@ -99,16 +101,11 @@ func setupRoutes(app *fiber.App, db *bun.DB, scheduler *gocron.Scheduler) {
 	})
 }
 
-func address() string {
-	port, exists := os.LookupEnv("PORT")
+func getEnv(env, fallback string) string {
+	value, exists := os.LookupEnv("HOST")
 	if !exists {
-		port = "3000"
+		return fallback
 	}
 
-	host, exists := os.LookupEnv("HOST")
-	if !exists {
-		host = "127.0.0.1"
-	}
-
-	return host + ":" + port
+	return value
 }

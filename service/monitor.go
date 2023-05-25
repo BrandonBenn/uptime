@@ -2,9 +2,7 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
 	"strings"
 	"time"
@@ -53,7 +51,10 @@ func PingMonitor(ctx context.Context, db *bun.DB, mon models.Monitor) error {
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
+
+	if resp != nil {
+		defer resp.Body.Close()
+	}
 
 	data.MonitorID = mon.ID
 	data.ResponseTime = time.Since(start).Seconds()
@@ -68,26 +69,30 @@ func PingMonitor(ctx context.Context, db *bun.DB, mon models.Monitor) error {
 }
 
 func AddMonitor(ctx context.Context, db *bun.DB, scheduler *gocron.Scheduler, mon models.Monitor) error {
-	var (
-		interval = int(mon.Interval*1000) + int(rand.Intn(1000)) // To avoid all monitors pinging at the same time
-		tag      = fmt.Sprint(mon.Name, "-", mon.ID)
-	)
+	interval := int(mon.Interval)
 
 	if _, err := scheduler.
 		Every(interval).
-		Millisecond().
-		Tag(tag).
+		Second().
+		Tag(mon.Tag()).
 		DoWithJobDetails(PingMonitorJob, db, mon); err != nil {
 		return err
+	}
+
+	if scheduler.IsRunning() {
+		log.Println("Added monitor", mon.Tag())
 	}
 
 	return nil
 }
 
 func RemoveMonitor(ctx context.Context, scheduler *gocron.Scheduler, mon models.Monitor) error {
-	tag := fmt.Sprint(mon.Name, "-", mon.ID)
-	if err := scheduler.RemoveByTag(tag); err != nil {
+	if err := scheduler.RemoveByTag(mon.Tag()); err != nil {
 		return err
+	}
+
+	if scheduler.IsRunning() {
+		log.Println("Removed monitor", mon.Tag())
 	}
 
 	return nil

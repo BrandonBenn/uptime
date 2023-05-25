@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/uptrace/bun"
@@ -32,3 +33,7 @@ type (
 		CreatedAt    time.Time `bun:",nullzero,notnull,default:current_timestamp"`
 	}
 )
+
+func (m *Monitor) Tag() string {
+	return fmt.Sprint(m.Name, "-", m.ID)
+}
